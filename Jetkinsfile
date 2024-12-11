@@ -8,5 +8,29 @@ pipeline {
                 git 'https://github.com/ndoreginald/data_docker_angular.git'
             }
         }
+
+        stage('Get Version') {
+            steps {
+                script {
+                    // Définir une fonction pour récupérer la version (hash court du commit)
+                    def getVersion = {
+                        return sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                    }
+
+                    // Assigner la version à la variable d'environnement DOCKER_TAG
+                    env.DOCKER_TAG = getVersion()
+                    echo "Docker tag: ${env.DOCKER_TAG}"
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                script {
+                    // Construire l'image Docker avec le tag approprié
+                    sh "docker build -t ndoreginald/data_docker_angular:${env.DOCKER_TAG} ."
+                }
+            }
+        }
     }
 }
