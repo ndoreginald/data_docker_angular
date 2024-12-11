@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        DOCKER_TAG = '' // Initialisation, sera défini dans une étape
+    }
 
     stages {
         stage('Clone Stage') {
@@ -8,28 +11,13 @@ pipeline {
                 git 'https://github.com/ndoreginald/data_docker_angular.git'
             }
         }
-
         stage('Get Version') {
             steps {
                 script {
-                    // Définir une fonction pour récupérer la version (hash court du commit)
-                    def getVersion = {
-                        return sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-                    }
-
-                    // Assigner la version à la variable d'environnement DOCKER_TAG
-                    env.DOCKER_TAG = getVersion()
-                    echo "Docker tag: ${env.DOCKER_TAG}"
+                    // Récupérer le hash de commit court et le stocker dans la variable DOCKER_TAG
+                    DOCKER_TAG = bat(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                 }
-            }
-        }
-
-        stage('Docker Build') {
-            steps {
-                script {
-                    // Construire l'image Docker avec le tag approprié
-                    sh "docker build -t ndoreginald/data_docker_angular:${env.DOCKER_TAG} ."
-                }
+                bat "docker tag: ${DOCKER_TAG}"
             }
         }
     }
