@@ -1,0 +1,12 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone Stage') {
+            steps {
+                // Cloner le dépôt Git
+                git 'https://gitlab.com/jmlhmd/datacamp_docker_angular.git'
+            }
+        }
+    }
+}
